@@ -6,11 +6,13 @@ import (
 	"net/http"
 )
 
-// LofInfo Logs IP and Header to the console
-// and Displays it on a website
+// LogInfo Logs IP and Header to the console  and Displays it on a website
 func LogInfo(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Println("\n\nX-Forwarded-For received by the Server: " + r.Header.Get("X-Forwarded-For"))
+	for k, v := range r.Header {
+		fmt.Printf("%v : %v \n", k, v)
+	}
+
 	fmt.Println("IP Address received by the Server: " + r.RemoteAddr)
 
 	w.WriteHeader(200)
