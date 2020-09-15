@@ -23,7 +23,7 @@ func LogInfo(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("IP Address received by the Server: " + r.RemoteAddr)
 	w.Header().Add("Content-Type", "text/html")
 	w.WriteHeader(200)
-	fmt.Fprintln(w, "X-Forwarded-For received by the Server: "+r.Header.Get("X-Forwarded-For"))
+	fmt.Fprintln(w, "X-Forwarded-For header received by the Server: "+r.Header.Get("X-Forwarded-For"))
 	fmt.Fprintln(w, "IP Address received by the Server: "+r.RemoteAddr)
 
 }
