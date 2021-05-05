@@ -5,38 +5,39 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 var logFile *os.File
 
-// LogInfo Logs IP and Header to the console  and Displays it on a website
-func LogInfo(w http.ResponseWriter, r *http.Request) {
-
-	for k, v := range r.Header {
-		stk := fmt.Sprintf("%v : %v \n", k, v)
-		logFile.WriteString(stk)
-
-	}
-
-	logFile.WriteString("================== \n")
-
-	fmt.Println("IP Address received by the Server: " + r.RemoteAddr)
-	w.Header().Add("Content-Type", "text/html")
-	w.WriteHeader(200)
-	fmt.Fprintln(w, "X-Forwarded-For received by the Server: "+r.Header.Get("X-Forwarded-For"))
-	fmt.Fprintln(w, "IP Address received by the Server: "+r.RemoteAddr)
-
-}
-
 func main() {
+
+	r := gin.Default()
+
+	gin.SetMode(gin.ReleaseMode)
+
 	var err error
-	logFile, err = os.Create("logfile.txt")
-	if err != nil {
+
+	if logFile, err = os.Create("logfile.txt"); err != nil {
 		log.Fatal("Log file create:", err)
 		return
 	}
 
-	http.HandleFunc("/", LogInfo)
-	log.Println("Listening on port 8000")
-	log.Fatal(http.ListenAndServe(":8000", nil))
+	r.Any("/*proxyPath", func(c *gin.Context) {
+
+		for k, v := range c.Request.Header {
+			stk := fmt.Sprintf("%v : %v \n", k, v)
+			logFile.WriteString(stk)
+
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"X-Forwarded-For": c.Request.Header.Get("X-Forwarded-For"),
+			"Remote Addr":     c.Request.RemoteAddr,
+			"Path":            c.Request.URL.Path,
+		})
+	})
+
+	r.Run()
 }
