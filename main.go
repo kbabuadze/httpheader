@@ -35,7 +35,7 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{
 			"X-Forwarded-For": c.Request.Header.Get("X-Forwarded-For"),
 			"Remote Addr":     c.Request.RemoteAddr,
-			"Path":            c.Request.URL.Path,
+			"Path":            c.Request.URL.String(),
 		})
 	})
 
